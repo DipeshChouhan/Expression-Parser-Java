@@ -1,13 +1,16 @@
 package com.miniblocks.org;
 
-import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.Stack;
 
 public class Evaluator {
+    private static Evaluator INSTANCE = null;
+    private Evaluator(){
 
-    public Stack<String> infixToPostFix(String expression){
+    }
+    private LinkedList<String> infixToPostFix(String expression){
         char[] tokens = expression.toCharArray();
-        Stack<String> exp = new Stack<>();
+        LinkedList<String> exp = new LinkedList<>();
         Stack<String> ops = new Stack<>();
         for(int i = 0; i < tokens.length; i++){
             if(tokens[i] == ' '){
@@ -19,7 +22,7 @@ public class Evaluator {
                 String number = String.valueOf(tokens[i++]);
 
                 while(i < tokens.length && isDigit(tokens[i])) number = number.concat(String.valueOf(tokens[i++]));
-                exp.push(number);
+                exp.addLast(number);
                 i--;
             }else if(isLetter(tokens[i])){
                 String fun = String.valueOf(tokens[i++]);
@@ -31,19 +34,19 @@ public class Evaluator {
                 ops.push(String.valueOf(tokens[i]));
             }else if(tokens[i] == ')'){
                 while(!ops.peek().equals("(")) {
-                    exp.push(ops.pop());
+                    exp.addLast(ops.pop());
                 }
                 ops.pop();
             }else{
                 String token = String.valueOf(tokens[i]);
                 while(!ops.isEmpty() && !hasPrecedence(ops.peek(), token)){
 
-                    exp.push(ops.pop());
+                    exp.addLast(ops.pop());
                 }
                 ops.push(token);
             }
         }
-        while(!ops.isEmpty()) exp.push(ops.pop());
+        while(!ops.isEmpty()) exp.addLast(ops.pop());
         return exp;
     }
 
@@ -53,7 +56,7 @@ public class Evaluator {
      * @param op2 - operator will be pushed to the stack.
      * @return {boolean} if higher precedence than true else false;
      */
-    public boolean hasPrecedence(String op1, String op2){
+    private boolean hasPrecedence(String op1, String op2){
         if(op1.equals("(") || op2.equals(")")) {
             return true;
         }else if(op1.equals("^") || op2.equals("^")){
@@ -67,7 +70,7 @@ public class Evaluator {
      * @param digit - char ex:- '1', '2' etc.
      * @return - true if it is digit or false if it is not.
      */
-    public boolean isDigit(char digit){
+    private boolean isDigit(char digit){
         return (digit >= '0' && digit <= '9') || digit == '.';
     }
 
@@ -80,10 +83,35 @@ public class Evaluator {
         return l >= 'a' && l <= 'z';
     }
 
-    private double postFixEvaluator(Stack<String> exp){
-
+    private boolean isNumber(String num){
+        return isDigit(num.charAt(0));
+    }
+    private boolean isFun(String op){
+        return isLetter(op.charAt(0));
+    }
+    private double postFixEvaluator(LinkedList<String> exp){
+        for(int i = 0; i < exp.size(); i++){
+            String token = exp.get(i);
+            if(!isNumber(token)){
+                if(isFun(token)){
+                   double result = doFunOp(Double.parseDouble(exp.remove(--i)), token);
+                   exp.remove(i);
+                   exp.add(i, String.valueOf(result));
+                }else{
+                    double result = doOp(Double.parseDouble(exp.remove(--i)), Double.parseDouble(exp.remove(--i)),
+                            token);
+                    exp.remove(i);
+                    exp.add(i, String.valueOf(result));
+                }
+            }
+        }
+        return Double.parseDouble(exp.getFirst());
     }
 
+    public double evaluate(String exp){
+
+        return postFixEvaluator(infixToPostFix(exp));
+    }
 
     private double doOp(double val1, double val2, String op){
         switch (op){
@@ -99,6 +127,7 @@ public class Evaluator {
                 return Math.pow(val2, val1);
 
         }
+        return -1;
     }
 
     private double doFunOp(double val, String fun){
@@ -114,6 +143,12 @@ public class Evaluator {
             case "sqr":
                 return Math.sqrt(val);
         }
+
+        return -1;
+    }
+
+    public static Evaluator getInstance(){
+        return INSTANCE == null ? INSTANCE = new Evaluator() : INSTANCE;
     }
 
 }

@@ -8,9 +8,8 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        Evaluator evaluator = new Evaluator();
-        String postFix = evaluator.infixToPostFix("12.3*4-sin(10").toString();
-        System.out.println(postFix);
+        Evaluator evaluator = Evaluator.getInstance();
+        System.out.println(evaluator.evaluate("102*40"));
     }
 
 
