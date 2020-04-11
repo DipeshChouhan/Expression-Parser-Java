@@ -1,15 +1,11 @@
 package com.miniblocks.org;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Stack;
+import com.miniblocks.org.evaluator.Evaluator;
 
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
-        Evaluator evaluator = Evaluator.getInstance();
-        System.out.println(evaluator.evaluate("102*40"));
+        System.out.println(Evaluator.getInstance().evaluate("sum(10)"));
     }
 
 

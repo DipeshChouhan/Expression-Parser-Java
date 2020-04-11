@@ -1,4 +1,4 @@
-package com.miniblocks.org;
+package com.miniblocks.org.evaluator;
 
 import java.util.LinkedList;
 import java.util.Stack;
@@ -127,6 +127,7 @@ public class Evaluator {
                 return Math.pow(val2, val1);
 
         }
+
         return -1;
     }
 
@@ -142,9 +143,23 @@ public class Evaluator {
                 return Math.log10(val);
             case "sqr":
                 return Math.sqrt(val);
+            case "fact":
+                return factorial(val);
+            case "sum":
+                return val*(val+1)/2;
+
         }
 
         return -1;
+    }
+
+    private double factorial(double val){
+        double result = 1;
+        for(int i = 2; i <= val; i++){
+            result *= i;
+        }
+
+        return result;
     }
 
     public static Evaluator getInstance(){
